@@ -1,140 +1,111 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, Image, StyleSheet, ScrollView, Dimensions } from "react-native";
+import { Text, View, Image, StyleSheet, FlatList } from "react-native";
 import { Card } from "react-native-paper";
 
-// Helper function to shuffle the movies
-const shuffleArray = (array) => {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-};
-
 const Home = () => {
-  const [movies, setMovies] = useState([]);
+  const [items, setItems] = useState([]); // Holds both movies and series
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchMovies();
+    fetchMedia();
   }, []);
 
-  const fetchMovies = async () => {
+  const fetchMedia = async () => {
     try {
-      // Fetch 2 movies from each genre
-      const comedyResponse = await fetch(
-        `http://www.omdbapi.com/?s=comedy&type=movie&apikey=617e1d0c`
-      );
-      const actionResponse = await fetch(
-        `http://www.omdbapi.com/?s=action&type=movie&apikey=617e1d0c`
-      );
-      const sciFiResponse = await fetch(
-        `http://www.omdbapi.com/?s=sci-fi&type=movie&apikey=617e1d0c`
-      );
-      const dramaResponse = await fetch(
-        `http://www.omdbapi.com/?s=drama&type=movie&apikey=617e1d0c`
-      );
-      const horrorResponse = await fetch(
-        `http://www.omdbapi.com/?s=horror&type=movie&apikey=617e1d0c`
-      );
+      // Fetch 6 movies and 6 series from OMDb
+      const movieResponse = await fetch(`http://www.omdbapi.com/?s=movie&type=movie&apikey=617e1d0c`);
+      const seriesResponse = await fetch(`http://www.omdbapi.com/?s=series&type=series&apikey=617e1d0c`);
 
-      // Parse responses
-      const comedyData = await comedyResponse.json();
-      const actionData = await actionResponse.json();
-      const sciFiData = await sciFiResponse.json();
-      const dramaData = await dramaResponse.json();
-      const horrorData = await horrorResponse.json();
+      const movieData = await movieResponse.json();
+      const seriesData = await seriesResponse.json();
 
-      let allMovies = [];
+      // Get exactly 6 movies and 6 series
+      const movies = movieData.Search ? movieData.Search.slice(0, 6) : [];
+      const series = seriesData.Search ? seriesData.Search.slice(0, 6) : [];
 
-      // Add 2 movies from each genre to the allMovies array
-      if (comedyData.Search) allMovies = [...allMovies, ...comedyData.Search.slice(0, 2)];
-      if (actionData.Search) allMovies = [...allMovies, ...actionData.Search.slice(0, 2)];
-      if (sciFiData.Search) allMovies = [...allMovies, ...sciFiData.Search.slice(0, 2)];
-      if (dramaData.Search) allMovies = [...allMovies, ...dramaData.Search.slice(0, 2)];
-      if (horrorData.Search) allMovies = [...allMovies, ...horrorData.Search.slice(0, 2)];
+      // Mix movies and series together
+      const mixedItems = [...movies, ...series].sort(() => Math.random() - 0.5);
 
-      // Shuffle the movies array to mix them up
-      shuffleArray(allMovies);
-
-      setMovies(allMovies); // Set mixed list of movies
+      setItems(mixedItems);
     } catch (error) {
-      console.error("Error fetching movies:", error);
+      console.error("Error fetching media:", error);
     } finally {
       setLoading(false);
     }
   };
 
+  const renderItem = ({ item }) => (
+    <View style={styles.movieContainer}>
+      <Card style={styles.card}>
+        <Image
+          source={{ uri: item.Poster !== "N/A" ? item.Poster : "https://via.placeholder.com/200" }}
+          style={styles.image}
+        />
+        <Card.Content>
+          <Text style={styles.movieTitle}>{item.Title}</Text>
+          <Text>Year: {item.Year}</Text>
+          <Text>Type: {item.Type}</Text>
+        </Card.Content>
+      </Card>
+    </View>
+  );
+
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Trending Movies</Text>
-        {loading ? (
-          <Text>Loading...</Text>
-        ) : (
-          <View style={styles.movieGrid}>
-            {movies.map((movie) => (
-              <View key={movie.imdbID} style={styles.movieContainer}>
-                <Card style={styles.card}>
-                  <Image
-                    source={{ uri: movie.Poster }}
-                    style={styles.image}
-                  />
-                  <Card.Content>
-                    <Text style={styles.movieTitle}>{movie.Title}</Text>
-                    <Text>Year: {movie.Year}</Text>
-                    <Text>Genres: {movie.Genre || 'N/A'}</Text>
-                  </Card.Content>
-                </Card>
-              </View>
-            ))}
-          </View>
-        )}
-      </View>
-    </ScrollView>
+    <View style={styles.screenContainer}>
+      <Text style={styles.title}>Trending Movies & Series</Text>
+      {loading ? (
+        <Text>Loading...</Text>
+      ) : (
+        <FlatList
+          data={items}
+          keyExtractor={(item) => item.imdbID}
+          renderItem={renderItem}
+          numColumns={3} // Display 3 items per row
+          contentContainerStyle={styles.listContainer}
+        />
+      )}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  screenContainer: {
+    flex: 1,
     padding: 16,
-    minHeight: Dimensions.get('window').height, // Set minimum height to screen height
+    alignItems: "center", // Keeps everything centered
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 16,
+    textAlign: "center",
   },
-  movieGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
+  listContainer: {
+    alignItems: "center", // Centering items
   },
   movieContainer: {
-    width: "30%", // Each movie takes up 30% of the container width (3 per row)
-    marginBottom: 16, // Add margin to separate movie cards
+    width: 180, // Set a fixed width
+    margin: 10, // Adds space between items
   },
   card: {
-    overflow: "hidden",
+    width: "100%", 
     borderRadius: 16,
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    padding: 10,
     backgroundColor: "white",
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
   },
   image: {
-    width: "100%", // Make the image take up the full width of the card
-    height: 200,
-    resizeMode: "contain", // Fit the image within the container without cropping
-  },
+    width: "110%",  // Ensures the image takes up the full container width
+    height: 250, // Adjust the height to your preferred size
+    resizeMode: "cover", // Ensures the image covers the container area without distortion
+  },  
   movieTitle: {
     fontWeight: "bold",
     textAlign: "center",
     marginTop: 8,
   },
-  scrollContainer: {
-    flexGrow: 1, // Ensures the content takes up enough space for scrolling
-  },
 });
+
 
 export default Home;
