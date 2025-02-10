@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Text, View, Image, StyleSheet, FlatList, Button, TouchableOpacity, TextInput } from "react-native";
 import { Card } from "react-native-paper";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const Home = ({ navigation }) => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
     fetchMedia();
@@ -47,6 +49,15 @@ const Home = ({ navigation }) => {
     navigation.navigate("MovieDetails", { movie: item });
   };
 
+  const handleFavoritePress = (item) => {
+    const isFavorite = favorites.some((fav) => fav.imdbID === item.imdbID);
+    if (isFavorite) {
+      setFavorites(favorites.filter((fav) => fav.imdbID !== item.imdbID));
+    } else {
+      setFavorites([...favorites, item]);
+    }
+  };
+
   const renderItem = ({ item }) => (
     <TouchableOpacity onPress={() => handleMoviePress(item)}>
       <View style={styles.movieContainer}>
@@ -60,6 +71,15 @@ const Home = ({ navigation }) => {
             <Text>Year: {item.Year}</Text>
             <Text>Type: {item.Type}</Text>
           </Card.Content>
+          <TouchableOpacity onPress={() => handleFavoritePress(item)}>
+            <View style={styles.favoriteIconContainer}>
+              <Icon
+                name={favorites.some((fav) => fav.imdbID === item.imdbID) ? "heart" : "heart-o"}
+                size={24}
+                color={favorites.some((fav) => fav.imdbID === item.imdbID) ? "red" : "gray"}
+              />
+            </View>
+          </TouchableOpacity>
         </Card>
       </View>
     </TouchableOpacity>
@@ -95,7 +115,14 @@ const Home = ({ navigation }) => {
             numColumns={4}
             contentContainerStyle={styles.listContainer}
           />
-          <Button title="Load More" onPress={handleLoadMore} />
+
+          <View style={styles.buttonContainer}>
+            <Button title="Load More" onPress={handleLoadMore} />
+            <Button
+              title="See Favorites"
+              onPress={() => navigation.navigate("FavouriteMovies", { favorites })}
+            />
+          </View>
         </>
       )}
     </View>
@@ -107,6 +134,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     alignItems: "center",
+    backgroundColor: "#f0f0f0",
   },
   title: {
     fontSize: 24,
@@ -115,20 +143,23 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   listContainer: {
-    paddingBottom: 80,
-    alignItems: "center",
+    flex: 1,
+    paddingBottom: 100,
   },
   movieContainer: {
     width: 180,
     margin: 10,
+    height: 380, 
   },
   card: {
     width: "100%",
+    height: "100%",
     borderRadius: 16,
     backgroundColor: "white",
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden",
+    marginBottom: 30,
   },
   image: {
     width: "110%",
@@ -142,7 +173,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   searchBar: {
-    width: "20%",
+    width: "80%",
     height: 50,
     padding: 12,
     marginBottom: 20,
@@ -155,6 +186,18 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
+  favoriteIconContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
+  },
+  buttonContainer: {
+    position: "absolute", 
+    bottom: 10,           
+    flexDirection: "row",  
+    justifyContent: "space-between", 
+    width: "25%",        
+    alignItems: "center",    
+  },
 });
-
 export default Home;

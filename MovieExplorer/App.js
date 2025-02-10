@@ -5,6 +5,7 @@ import { View, StyleSheet } from "react-native";
 import Home from "./screens/Home";
 import Login from "./screens/Login";
 import MovieDetails from "./screens/MovieDetails";
+import FavouriteMovies from "./screens/FavouriteMovies";
 
 const Drawer = createDrawerNavigator();
 
@@ -15,13 +16,14 @@ const App = () => {
         <Drawer.Navigator
           // initialRouteName="Login"
           // screenOptions={({ route }) => ({
-          //   drawerType: route.name === "Login" ? "front" : "slide", // Adjust drawer type based on route
-          //   drawerStyle: route.name === "Login" ? { display: "none" } : {}, // Hide drawer on Login screen
+          //   drawerType: route.name === "Login" ? "front" : "slide", 
+          //   drawerStyle: route.name === "Login" ? { display: "none" } : {}, 
           // })}
         >
           {/* <Drawer.Screen name="Login" component={Login} /> */}
           <Drawer.Screen name="Home" component={Home} />
           <Drawer.Screen name="MovieDetails" component={MovieDetails} />
+          <Drawer.Screen name="FavouriteMovies" component={FavouriteMovies} />
         </Drawer.Navigator>
       </NavigationContainer>
     </View>
@@ -30,7 +32,7 @@ const App = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1, // Ensures the full-screen height is used
+    flex: 1,
   },
 });
 
