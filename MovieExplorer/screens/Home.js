@@ -1,32 +1,34 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, Image, StyleSheet, FlatList } from "react-native";
+import { Text, View, Image, StyleSheet, FlatList, Button, TouchableOpacity } from "react-native";
 import { Card } from "react-native-paper";
 
-const Home = () => {
-  const [items, setItems] = useState([]); // Holds both movies and series
+const Home = ({ navigation }) => {
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     fetchMedia();
   }, []);
 
-  const fetchMedia = async () => {
+  const fetchMedia = async (page = 1) => {
     try {
-      // Fetch 6 movies and 6 series from OMDb
-      const movieResponse = await fetch(`http://www.omdbapi.com/?s=movie&type=movie&apikey=617e1d0c`);
-      const seriesResponse = await fetch(`http://www.omdbapi.com/?s=series&type=series&apikey=617e1d0c`);
+      const movieResponse = await fetch(`http://www.omdbapi.com/?s=movie&type=movie&page=${page}&apikey=617e1d0c`);
+      const seriesResponse = await fetch(`http://www.omdbapi.com/?s=series&type=series&page=${page}&apikey=617e1d0c`);
 
       const movieData = await movieResponse.json();
       const seriesData = await seriesResponse.json();
 
-      // Get exactly 6 movies and 6 series
       const movies = movieData.Search ? movieData.Search.slice(0, 6) : [];
       const series = seriesData.Search ? seriesData.Search.slice(0, 6) : [];
 
-      // Mix movies and series together
       const mixedItems = [...movies, ...series].sort(() => Math.random() - 0.5);
 
-      setItems(mixedItems);
+      if (page === 1) {
+        setItems(mixedItems);
+      } else {
+        setItems((prevItems) => [...prevItems, ...mixedItems]);
+      }
     } catch (error) {
       console.error("Error fetching media:", error);
     } finally {
@@ -34,20 +36,32 @@ const Home = () => {
     }
   };
 
+  const handleLoadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchMedia(nextPage);
+  };
+
+  const handleMoviePress = (item) => {
+    navigation.navigate("MovieDetails", { movie: item });
+  };
+
   const renderItem = ({ item }) => (
-    <View style={styles.movieContainer}>
-      <Card style={styles.card}>
-        <Image
-          source={{ uri: item.Poster !== "N/A" ? item.Poster : "https://via.placeholder.com/200" }}
-          style={styles.image}
-        />
-        <Card.Content>
-          <Text style={styles.movieTitle}>{item.Title}</Text>
-          <Text>Year: {item.Year}</Text>
-          <Text>Type: {item.Type}</Text>
-        </Card.Content>
-      </Card>
-    </View>
+    <TouchableOpacity onPress={() => handleMoviePress(item)}>
+      <View style={styles.movieContainer}>
+        <Card style={styles.card}>
+          <Image
+            source={{ uri: item.Poster !== "N/A" ? item.Poster : "https://via.placeholder.com/200" }}
+            style={styles.image}
+          />
+          <Card.Content>
+            <Text style={styles.movieTitle}>{item.Title}</Text>
+            <Text>Year: {item.Year}</Text>
+            <Text>Type: {item.Type}</Text>
+          </Card.Content>
+        </Card>
+      </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -56,13 +70,16 @@ const Home = () => {
       {loading ? (
         <Text>Loading...</Text>
       ) : (
-        <FlatList
-          data={items}
-          keyExtractor={(item) => item.imdbID}
-          renderItem={renderItem}
-          numColumns={3} // Display 3 items per row
-          contentContainerStyle={styles.listContainer}
-        />
+        <>
+          <FlatList
+            data={items}
+            keyExtractor={(item) => item.imdbID}
+            renderItem={renderItem}
+            numColumns={4} // Adjusted to 2 columns for better spacing
+            contentContainerStyle={styles.listContainer}
+          />
+          <Button title="Load More" onPress={handleLoadMore} />
+        </>
       )}
     </View>
   );
@@ -72,7 +89,7 @@ const styles = StyleSheet.create({
   screenContainer: {
     flex: 1,
     padding: 16,
-    alignItems: "center", // Keeps everything centered
+    alignItems: "center",
   },
   title: {
     fontSize: 24,
@@ -81,14 +98,15 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   listContainer: {
-    alignItems: "center", // Centering items
+    paddingBottom: 80,
+    alignItems: "center",
   },
   movieContainer: {
-    width: 180, // Set a fixed width
-    margin: 10, // Adds space between items
+    width: 180,
+    margin: 10,
   },
   card: {
-    width: "100%", 
+    width: "100%",
     borderRadius: 16,
     backgroundColor: "white",
     alignItems: "center",
@@ -96,16 +114,16 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   image: {
-    width: "110%",  // Ensures the image takes up the full container width
-    height: 250, // Adjust the height to your preferred size
-    resizeMode: "cover", // Ensures the image covers the container area without distortion
-  },  
+    width: "110%",
+    height: 250,
+    resizeMode: "cover",
+  },
   movieTitle: {
     fontWeight: "bold",
     textAlign: "center",
     marginTop: 8,
+    fontSize: 12,
   },
 });
-
 
 export default Home;

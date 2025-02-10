@@ -35,7 +35,7 @@ const Login = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome to Fake API Call</Text>
+      <Text style={styles.title}>Welcome to Movie Explorer App</Text>
       <View style={styles.formContainer}>
         <TextInput
           style={styles.input}
@@ -53,7 +53,7 @@ const Login = ({ navigation }) => {
           onChangeText={(text) => setPassword(text)}
         />
         <View style={styles.buttonContainer}>
-          <Button title="Login" onPress={Handle} color="#6200ee" />
+          <Button title="Login" onPress={Handle} color="#6200ee" /> {/* Default button color */}
         </View>
       </View>
     </View>
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f5f5f5", // Light background color
+    backgroundColor: "#eef1ec", // Light background color
     padding: 20,
   },
   title: {
