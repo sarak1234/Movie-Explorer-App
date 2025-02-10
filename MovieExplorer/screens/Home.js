@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, Image, StyleSheet, FlatList, Button, TouchableOpacity } from "react-native";
+import { Text, View, Image, StyleSheet, FlatList, Button, TouchableOpacity, TextInput } from "react-native";
 import { Card } from "react-native-paper";
 
 const Home = ({ navigation }) => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchMedia();
@@ -64,18 +65,34 @@ const Home = ({ navigation }) => {
     </TouchableOpacity>
   );
 
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+  };
+
+  const filteredItems = items.filter((item) =>
+    item.Title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <View style={styles.screenContainer}>
       <Text style={styles.title}>Trending Movies & Series</Text>
+
+      <TextInput
+        style={styles.searchBar}
+        placeholder="Search Movies & Series"
+        value={searchQuery}
+        onChangeText={handleSearch}
+      />
+
       {loading ? (
         <Text>Loading...</Text>
       ) : (
         <>
           <FlatList
-            data={items}
+            data={filteredItems}
             keyExtractor={(item) => item.imdbID}
             renderItem={renderItem}
-            numColumns={4} // Adjusted to 2 columns for better spacing
+            numColumns={4}
             contentContainerStyle={styles.listContainer}
           />
           <Button title="Load More" onPress={handleLoadMore} />
@@ -123,6 +140,20 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 8,
     fontSize: 12,
+  },
+  searchBar: {
+    width: "20%",
+    height: 50,
+    padding: 12,
+    marginBottom: 20,
+    backgroundColor: "white",
+    borderRadius: 8,
+    fontSize: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
   },
 });
 

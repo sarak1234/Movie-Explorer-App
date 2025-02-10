@@ -31,46 +31,46 @@ const MovieDetails = ({ route }) => {
 const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
-    backgroundColor: "#121212",
+    backgroundColor: "#FFFFFF",
     alignItems: "center",
     paddingBottom: 20,
   },
   poster: {
-    width: "80%", // 80% of the screen width
-    height: 300, // Reduced height to avoid zoom-in
-    resizeMode: "contain", // Prevents image stretching or cropping
+    width: "80%",
+    height: 300,
+    resizeMode: "contain",
     borderRadius: 10,
     marginVertical: 20,
-    alignSelf: "center", // Centers the image
+    alignSelf: "center",
   },
   detailsContainer: {
-    backgroundColor: "#1e1e1e",
+    backgroundColor: "#F1F1F1",
     padding: 20,
     borderRadius: 15,
     width: "90%",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
     elevation: 6,
   },
   title: {
     fontSize: 26,
     fontWeight: "bold",
-    color: "#FFFFFF",
+    color: "#333",
     marginBottom: 12,
   },
   detail: {
     fontSize: 18,
-    color: "#ccc",
+    color: "#555",
     marginBottom: 8,
   },
   bold: {
     fontWeight: "bold",
-    color: "#fff",
+    color: "#000",
   },
   centerText: {
-    textAlign: "center", // Centers the text horizontally
+    textAlign: "center",
   },
 });
 

@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     width: "100%",
-    maxWidth: 400, // Limit form width for better readability
+    maxWidth: 400, 
   },
   input: {
     width: "100%",
@@ -86,12 +86,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 15,
     paddingHorizontal: 15,
-    backgroundColor: "#fff", // White background for inputs
+    backgroundColor: "#fff", 
     fontSize: 16,
   },
   buttonContainer: {
     borderRadius: 8,
-    overflow: "hidden", // Ensures the button respects the border radius
+    overflow: "hidden",
   },
 });
 
