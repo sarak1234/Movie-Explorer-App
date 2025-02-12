@@ -12,9 +12,9 @@ const Home = ({ navigation }) => {
 
   useEffect(() => {
     fetchMedia();
-  }, []);
+  }, [page]);
 
-  const fetchMedia = async (page = 1) => {
+  const fetchMedia = async () => {
     try {
       const movieResponse = await fetch(`http://www.omdbapi.com/?s=movie&type=movie&page=${page}&apikey=617e1d0c`);
       const seriesResponse = await fetch(`http://www.omdbapi.com/?s=series&type=series&page=${page}&apikey=617e1d0c`);
@@ -27,11 +27,7 @@ const Home = ({ navigation }) => {
 
       const mixedItems = [...movies, ...series].sort(() => Math.random() - 0.5);
 
-      if (page === 1) {
-        setItems(mixedItems);
-      } else {
-        setItems((prevItems) => [...prevItems, ...mixedItems]);
-      }
+      setItems((prevItems) => (page === 1 ? mixedItems : [...prevItems, ...mixedItems]));
     } catch (error) {
       console.error("Error fetching media:", error);
     } finally {
@@ -40,9 +36,7 @@ const Home = ({ navigation }) => {
   };
 
   const handleLoadMore = () => {
-    const nextPage = page + 1;
-    setPage(nextPage);
-    fetchMedia(nextPage);
+    setPage(page + 1);
   };
 
   const handleMoviePress = (item) => {
@@ -56,6 +50,10 @@ const Home = ({ navigation }) => {
     } else {
       setFavorites([...favorites, item]);
     }
+  };
+
+  const handleGoToFavorites = () => {
+    navigation.navigate("FavouriteMovies", { favorites, setFavorites });
   };
 
   const renderItem = ({ item }) => (
@@ -119,8 +117,8 @@ const Home = ({ navigation }) => {
           <View style={styles.buttonContainer}>
             <Button title="Load More" onPress={handleLoadMore} />
             <Button
-              title="See Favorites"
-              onPress={() => navigation.navigate("FavouriteMovies", { favorites })}
+              title="Favourite Movies"
+              onPress={handleGoToFavorites}
             />
           </View>
         </>
@@ -149,7 +147,7 @@ const styles = StyleSheet.create({
   movieContainer: {
     width: 180,
     margin: 10,
-    height: 380, 
+    height: 380,
   },
   card: {
     width: "100%",
@@ -173,7 +171,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   searchBar: {
-    width: "80%",
+    width: "35%",
     height: 50,
     padding: 12,
     marginBottom: 20,
@@ -192,12 +190,13 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   buttonContainer: {
-    position: "absolute", 
-    bottom: 10,           
-    flexDirection: "row",  
-    justifyContent: "space-between", 
-    width: "25%",        
-    alignItems: "center",    
+    position: "absolute",
+    bottom: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "25%",
+    alignItems: "center",
   },
 });
+
 export default Home;

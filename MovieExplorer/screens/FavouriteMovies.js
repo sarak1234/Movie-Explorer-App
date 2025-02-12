@@ -1,15 +1,9 @@
 import React from "react";
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from "react-native";
 import { Card } from "react-native-paper";
-import Icon from "react-native-vector-icons/FontAwesome";
 
 const FavouriteMovies = ({ route, navigation }) => {
-  const { favorites, setFavorites } = route.params;  // Make sure you pass setFavorites to update the list
-
-  const handleRemoveFavorite = (item) => {
-    const updatedFavorites = favorites.filter((fav) => fav.imdbID !== item.imdbID);
-    setFavorites(updatedFavorites);  // Update the favorites list in the parent component (e.g., Home)
-  };
+  const { favorites } = route.params;  // Only receive the favorites list, no setFavorites needed
 
   const renderItem = ({ item }) => (
     <TouchableOpacity onPress={() => navigation.navigate("MovieDetails", { movie: item })}>
@@ -26,11 +20,6 @@ const FavouriteMovies = ({ route, navigation }) => {
             <Text>Year: {item.Year}</Text>
             <Text>Type: {item.Type}</Text>
           </Card.Content>
-          <TouchableOpacity onPress={() => handleRemoveFavorite(item)}>
-            <View style={styles.favoriteIconContainer}>
-              <Icon name="trash" size={24} color="red" />
-            </View>
-          </TouchableOpacity>
         </Card>
       </View>
     </TouchableOpacity>
@@ -97,11 +86,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 8,
     fontSize: 12,
-  },
-  favoriteIconContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 10,
   },
 });
 
