@@ -21,7 +21,8 @@ const FavouriteMovies = ({ route, navigation }) => {
           />
           <Card.Content>
             <Text style={styles.movieTitle}>{item.title || item.name}</Text>
-            <Text>Year: {item.release_date?.split("-")[0]}</Text>
+            <Text>Type: {item.media_type === 'movie' ? 'Movie' : 'Series'}</Text>
+            <Text>Year: {item.release_date ? item.release_date.split("-")[0] : "N/A"}</Text>
           </Card.Content>
         </Card>
       </View>
@@ -38,7 +39,7 @@ const FavouriteMovies = ({ route, navigation }) => {
           data={favorites}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
-          numColumns={3}
+          numColumns={3} // Keep 3 movies per row
           contentContainerStyle={styles.listContainer}
         />
       )}
@@ -68,8 +69,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   movieContainer: {
-    width: 180,
-    margin: 10,
+    width: 180, // Keep the same width
+    margin: 10, // Keep the same margin
   },
   card: {
     width: "100%",
@@ -81,8 +82,10 @@ const styles = StyleSheet.create({
   },
   image: {
     width: "100%",
-    height: 250,
+    height: 250, // Adjusted height for better proportions
     resizeMode: "cover",
+    borderTopLeftRadius: 16, // Rounded corners for the top of the image
+    borderTopRightRadius: 16,
   },
   movieTitle: {
     fontWeight: "bold",

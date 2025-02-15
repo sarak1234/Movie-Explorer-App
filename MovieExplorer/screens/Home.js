@@ -41,7 +41,7 @@ const Home = ({ navigation }) => {
   };
 
   const handleMoviePress = (item) => {
-    navigation.navigate("MovieDetails", { movie: item });
+    navigation.navigate("MovieDetails", { movie: item }); // Pass the movie data to MovieDetails
   };
 
   const handleFavoritePress = (item) => {
@@ -94,7 +94,7 @@ const Home = ({ navigation }) => {
                   />
                   <Card.Content>
                     <Text style={styles.movieTitle}>{item.title || item.name}</Text>
-                    <Text>Year: {item.release_date?.split("-")[0]}</Text>
+                    <Text>Year: {item.release_date ? item.release_date.split("-")[0] : "N/A"}</Text>
                     <Text>Type: {item.media_type === 'movie' ? 'Movie' : 'Series'}</Text>
                   </Card.Content>
                   <TouchableOpacity onPress={() => handleFavoritePress(item)}>
