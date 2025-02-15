@@ -3,22 +3,25 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from "react
 import { Card } from "react-native-paper";
 
 const FavouriteMovies = ({ route, navigation }) => {
-  const { favorites } = route.params;  // Only receive the favorites list, no setFavorites needed
+  // Getting the favorites list passed from Home.js
+  const { favorites } = route.params;
 
+  // Render each movie item
   const renderItem = ({ item }) => (
-    <TouchableOpacity onPress={() => navigation.navigate("MovieDetails", { movie: item })}>
+    <TouchableOpacity onPress={() => navigation.navigate("Home")}>
       <View style={styles.movieContainer}>
         <Card style={styles.card}>
           <Image
             source={{
-              uri: item.Poster !== "N/A" ? item.Poster : "https://via.placeholder.com/200",
+              uri: item.poster_path
+                ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
+                : "https://via.placeholder.com/200",
             }}
             style={styles.image}
           />
           <Card.Content>
-            <Text style={styles.movieTitle}>{item.Title}</Text>
-            <Text>Year: {item.Year}</Text>
-            <Text>Type: {item.Type}</Text>
+            <Text style={styles.movieTitle}>{item.title || item.name}</Text>
+            <Text>Year: {item.release_date?.split("-")[0]}</Text>
           </Card.Content>
         </Card>
       </View>
@@ -33,7 +36,7 @@ const FavouriteMovies = ({ route, navigation }) => {
       ) : (
         <FlatList
           data={favorites}
-          keyExtractor={(item) => item.imdbID}
+          keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
           numColumns={3}
           contentContainerStyle={styles.listContainer}
@@ -77,7 +80,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   image: {
-    width: "110%",
+    width: "100%",
     height: 250,
     resizeMode: "cover",
   },

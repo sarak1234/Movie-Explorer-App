@@ -11,25 +11,26 @@ const Home = ({ navigation }) => {
   const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
-    fetchMedia();
+    fetchTrending();
   }, [page]);
 
-  const fetchMedia = async () => {
+  const fetchTrending = async () => {
     try {
-      const movieResponse = await fetch(`http://www.omdbapi.com/?s=movie&type=movie&page=${page}&apikey=617e1d0c`);
-      const seriesResponse = await fetch(`http://www.omdbapi.com/?s=series&type=series&page=${page}&apikey=617e1d0c`);
+      const response = await fetch(`https://api.themoviedb.org/3/trending/all/week?api_key=4705d52785ca9b43e39295d4291dd000&page=${page}`);
+      const data = await response.json();
 
-      const movieData = await movieResponse.json();
-      const seriesData = await seriesResponse.json();
+      // Separate the movies and series
+      const movies = data.results.filter(item => item.media_type === 'movie').slice(0, 6);  // Get 6 movies
+      const series = data.results.filter(item => item.media_type === 'tv').slice(0, 6);   // Get 6 series
 
-      const movies = movieData.Search ? movieData.Search.slice(0, 6) : [];
-      const series = seriesData.Search ? seriesData.Search.slice(0, 6) : [];
+      // Combine both in random order
+      const combinedItems = [...movies, ...series];
+      combinedItems.sort(() => Math.random() - 0.5); // Shuffle the array
 
-      const mixedItems = [...movies, ...series].sort(() => Math.random() - 0.5);
-
-      setItems((prevItems) => (page === 1 ? mixedItems : [...prevItems, ...mixedItems]));
+      // Append the new items to the existing ones (if it's not the first page)
+      setItems((prevItems) => (page === 1 ? combinedItems : [...prevItems, ...combinedItems]));
     } catch (error) {
-      console.error("Error fetching media:", error);
+      console.error("Error fetching trending movies:", error);
     } finally {
       setLoading(false);
     }
@@ -44,85 +45,79 @@ const Home = ({ navigation }) => {
   };
 
   const handleFavoritePress = (item) => {
-    const isFavorite = favorites.some((fav) => fav.imdbID === item.imdbID);
+    const isFavorite = favorites.some((fav) => fav.id === item.id);
     if (isFavorite) {
-      setFavorites(favorites.filter((fav) => fav.imdbID !== item.imdbID));
+      setFavorites(favorites.filter((fav) => fav.id !== item.id));
     } else {
       setFavorites([...favorites, item]);
     }
   };
 
   const handleGoToFavorites = () => {
-    navigation.navigate("FavouriteMovies", { favorites, setFavorites });
+    navigation.navigate("FavouriteMovies", { favorites });
   };
-
-  const renderItem = ({ item }) => (
-    <TouchableOpacity onPress={() => handleMoviePress(item)}>
-      <View style={styles.movieContainer}>
-        <Card style={styles.card}>
-          <Image
-            source={{ uri: item.Poster !== "N/A" ? item.Poster : "https://via.placeholder.com/200" }}
-            style={styles.image}
-          />
-          <Card.Content>
-            <Text style={styles.movieTitle}>{item.Title}</Text>
-            <Text>Year: {item.Year}</Text>
-            <Text>Type: {item.Type}</Text>
-          </Card.Content>
-          <TouchableOpacity onPress={() => handleFavoritePress(item)}>
-            <View style={styles.favoriteIconContainer}>
-              <Icon
-                name={favorites.some((fav) => fav.imdbID === item.imdbID) ? "heart" : "heart-o"}
-                size={24}
-                color={favorites.some((fav) => fav.imdbID === item.imdbID) ? "red" : "gray"}
-              />
-            </View>
-          </TouchableOpacity>
-        </Card>
-      </View>
-    </TouchableOpacity>
-  );
 
   const handleSearch = (query) => {
     setSearchQuery(query);
   };
 
   const filteredItems = items.filter((item) =>
-    item.Title.toLowerCase().includes(searchQuery.toLowerCase())
+    (item.title || item.name)?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
     <View style={styles.screenContainer}>
       <Text style={styles.title}>Trending Movies & Series</Text>
-
       <TextInput
         style={styles.searchBar}
         placeholder="Search Movies & Series"
         value={searchQuery}
         onChangeText={handleSearch}
       />
-
       {loading ? (
         <Text>Loading...</Text>
       ) : (
-        <>
-          <FlatList
-            data={filteredItems}
-            keyExtractor={(item) => item.imdbID}
-            renderItem={renderItem}
-            numColumns={4}
-            contentContainerStyle={styles.listContainer}
-          />
-
-          <View style={styles.buttonContainer}>
-            <Button title="Load More" onPress={handleLoadMore} />
-            <Button
-              title="Favourite Movies"
-              onPress={handleGoToFavorites}
-            />
-          </View>
-        </>
+        <FlatList
+          data={filteredItems}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => handleMoviePress(item)}>
+              <View style={styles.movieContainer}>
+                <Card style={styles.card}>
+                  <Image
+                    source={{
+                      uri: item.poster_path
+                        ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
+                        : "https://via.placeholder.com/200",
+                    }}
+                    style={styles.image}
+                  />
+                  <Card.Content>
+                    <Text style={styles.movieTitle}>{item.title || item.name}</Text>
+                    <Text>Year: {item.release_date?.split("-")[0]}</Text>
+                    <Text>Type: {item.media_type === 'movie' ? 'Movie' : 'Series'}</Text>
+                  </Card.Content>
+                  <TouchableOpacity onPress={() => handleFavoritePress(item)}>
+                    <View style={styles.favoriteIconContainer}>
+                      <Icon
+                        name={favorites.some((fav) => fav.id === item.id) ? "heart" : "heart-o"}
+                        size={24}
+                        color={favorites.some((fav) => fav.id === item.id) ? "red" : "gray"}
+                      />
+                    </View>
+                  </TouchableOpacity>
+                </Card>
+              </View>
+            </TouchableOpacity>
+          )}
+          numColumns={3} // Display 3 items per row
+          contentContainerStyle={styles.listContainer}
+        />
       )}
+      <View style={styles.buttonContainer}>
+        <Button title="Load More" onPress={handleLoadMore} />
+        <Button title="Favourite Movies" onPress={handleGoToFavorites} />
+      </View>
     </View>
   );
 };
