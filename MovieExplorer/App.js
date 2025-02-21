@@ -27,8 +27,8 @@ const App = () => {
           <Drawer.Screen name="Home" component={Home} />
           <Drawer.Screen name="Discover Movies" component={DiscoverMovies} />
           <Drawer.Screen name="Upcoming Releases" component={UpcomingReleases} />
-          
-          {/* MovieDetails and FavouriteMovies are part of the navigator but hidden in the drawer */}
+  
+  
           <Drawer.Screen name="MovieDetails" component={MovieDetails} />
           <Drawer.Screen name="FavouriteMovies" component={FavouriteMovies} />
         </Drawer.Navigator>

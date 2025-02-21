@@ -68,7 +68,7 @@ const DiscoverMovies = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Discover New Movies</Text>
+      <Text style={styles.title}>Discover  Movies</Text>
       <FlatList
         data={movies}
         keyExtractor={(item) => item.id.toString()}
@@ -104,20 +104,20 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     paddingBottom: 80,
-    alignItems: "center", // Center the cards horizontally
+    alignItems: "center", 
   },
   card: {
-    width: 160, // Fixed width for all cards
-    height: 300, // Fixed height for all cards
+    width: 160, 
+    height: 300, 
     margin: 8,
     borderRadius: 16,
     backgroundColor: "white",
     overflow: "hidden",
-    alignItems: "center", // Center content inside the card
+    alignItems: "center", 
   },
   image: {
     width: "100%",
-    height: 200, // Fixed height for the image
+    height: 200, 
     resizeMode: "cover",
   },
   movieTitle: {

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, Image, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
 
 const MovieDetails = ({ route }) => {
-  const { movie } = route.params; // Get the movie data from navigation params
+  const { movie } = route.params;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 10,
     elevation: 6,
-    alignSelf: "center", // Center the card horizontally
+    alignSelf: "center",
   },
   title: {
     fontSize: 28,
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#555",
     marginBottom: 8,
-    textAlign: "center", // Centered text
+    textAlign: "center",
   },
   bold: {
     fontWeight: "bold",

@@ -3,10 +3,8 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from "react
 import { Card } from "react-native-paper";
 
 const FavouriteMovies = ({ route, navigation }) => {
-  // Getting the favorites list passed from Home.js
   const { favorites } = route.params;
 
-  // Render each movie item
   const renderItem = ({ item }) => (
     <TouchableOpacity onPress={() => navigation.navigate("Home")}>
       <View style={styles.movieContainer}>
@@ -39,7 +37,7 @@ const FavouriteMovies = ({ route, navigation }) => {
           data={favorites}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
-          numColumns={3} // Keep 3 movies per row
+          numColumns={3}
           contentContainerStyle={styles.listContainer}
         />
       )}
@@ -69,8 +67,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   movieContainer: {
-    width: 180, // Keep the same width
-    margin: 10, // Keep the same margin
+    width: 180,
+    margin: 10,
   },
   card: {
     width: "100%",
@@ -82,9 +80,9 @@ const styles = StyleSheet.create({
   },
   image: {
     width: "100%",
-    height: 250, // Adjusted height for better proportions
+    height: 250,
     resizeMode: "cover",
-    borderTopLeftRadius: 16, // Rounded corners for the top of the image
+    borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
   },
   movieTitle: {
