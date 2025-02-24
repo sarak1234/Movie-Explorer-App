@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity, Button, ActivityIndicator } from "react-native";
 import { Card } from "react-native-paper";
 
 const UpcomingReleases = ({ navigation }) => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [page, setPage] = useState(1); // Add a page state
 
   const fetchUpcomingMovies = async () => {
     try {
       const response = await fetch(
-        "https://api.themoviedb.org/3/movie/upcoming?api_key=4705d52785ca9b43e39295d4291dd000"
+        `https://api.themoviedb.org/3/movie/upcoming?api_key=4705d52785ca9b43e39295d4291dd000&page=${page}`
       );
       const data = await response.json();
       if (data.results) {
-        setMovies(data.results);
+        setMovies((prevMovies) => (page === 1 ? data.results : [...prevMovies, ...data.results]));
       } else {
         throw new Error("No upcoming movies found.");
       }
@@ -28,7 +29,7 @@ const UpcomingReleases = ({ navigation }) => {
 
   useEffect(() => {
     fetchUpcomingMovies();
-  }, []);
+  }, [page]);
 
   const renderItem = ({ item }) => (
     <TouchableOpacity onPress={() => navigation.navigate("MovieDetails", { movie: item })}>
@@ -50,10 +51,14 @@ const UpcomingReleases = ({ navigation }) => {
     </TouchableOpacity>
   );
 
+  const handleLoadMore = () => {
+    setPage(page + 1);
+  };
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#007acc" />
       </View>
     );
   }
@@ -76,6 +81,13 @@ const UpcomingReleases = ({ navigation }) => {
         numColumns={3}
         contentContainerStyle={styles.listContainer}
       />
+      <View style={styles.loadMoreButtonContainer}>
+        <Button
+          title="Load More"
+          onPress={handleLoadMore}
+          color="#007acc"
+        />
+      </View>
     </View>
   );
 };
@@ -125,6 +137,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 8,
     fontSize: 14,
+  },
+  loadMoreButtonContainer: {
+    marginVertical: 20,
+    alignItems: "center",
   },
 });
 

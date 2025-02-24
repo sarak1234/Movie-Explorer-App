@@ -30,6 +30,9 @@ const Home = ({ navigation }) => {
       const combinedItems = [...movies, ...series];
       combinedItems.sort(() => Math.random() - 0.5);
 
+      // Log the years to see what data you have
+      console.log(combinedItems.map(item => item.release_date?.split("-")[0]));
+
       setItems((prevItems) => (page === 1 ? combinedItems : [...prevItems, ...combinedItems]));
     } catch (error) {
       console.error("Error fetching trending movies:", error);
@@ -73,6 +76,7 @@ const Home = ({ navigation }) => {
     setSearchQuery(query);
   };
 
+  // Filter items based on the search query, selected genre, and selected year
   const filteredItems = items.filter((item) => {
     const matchesSearchQuery = (item.title || item.name)?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesGenre = selectedGenre ? item.genre_ids.includes(parseInt(selectedGenre)) : true;
@@ -108,7 +112,11 @@ const Home = ({ navigation }) => {
           onValueChange={(itemValue) => setSelectedYear(itemValue)}
         >
           <Picker.Item label="All Years" value="" />
-          {Array.from(new Set(items.map(item => item.release_date?.split("-")[0]))).map((year) => (
+          {Array.from(new Set(
+            items
+              .map(item => item.release_date?.split("-")[0]) // Extract the year
+              .filter(year => year) // Filter out invalid or empty years
+          )).map((year) => (
             <Picker.Item key={year} label={year} value={year} />
           ))}
         </Picker>
@@ -259,7 +267,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     padding: 10,
     backgroundColor: "#f0f0f0",
-    elevation: 10, // Ensure buttons stay above other content
+    elevation: 10,
   },
   noResultsText: {
     fontSize: 18,
